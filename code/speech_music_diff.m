@@ -1,9 +1,9 @@
 
 %get dem tracks
-[y1,fs1] = audioread('mic1_Dev.m4a');
-[y2,fs2] = audioread('mic1_Elle.m4a');
-[y3,fs3] = audioread('mic2_silence.m4a');
-[y5,fs5] = audioread('Jolene.m4a');
+[y1,fs1] = audioread('../sound_recs/mic1_Dev.m4a');
+[y2,fs2] = audioread('../sound_recs/mic1_Elle.m4a');
+[y3,fs3] = audioread('../sound_recs/mic2_silence.m4a');
+[y5,fs5] = audioread('../sound_recs/Jolene.m4a');
 
 
 %find the clap in each
@@ -88,5 +88,6 @@ fprintf('1 = Speech\n');
 fprintf('2 = Silence\n');
 fprintf('3 = Music\n');
 
+soundsc(y6, fs1);
 
 plot(y7);
