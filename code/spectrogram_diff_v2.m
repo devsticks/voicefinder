@@ -2,9 +2,9 @@
 %get dem tracks
 %specify sampling frequency
 Fs = 48000;
-window_length = 500;%48000*10;
+window_length = 50000;%48000*10;
 overlap = 10;
-fft_freqs = 500; 
+fft_freqs = 20000; 
 
 filenames = ["Dev", "Elle", "DevElleDiff", "DevElleSame", "silence", "testingVariety"];
 filenames1 = "../sound_recs_aligned/mic1_" + filenames + ".wav";
@@ -63,14 +63,14 @@ for i = 1%floor(len/ave_len)
 figure();
     hold on
     subplot(211), spectrogram(y1(1+(ave_len*(i-1)):ave_len*i,1),window_length,overlap,fft_freqs,Fs,'yaxis', 'power');
-    subplot(211), spectrogram(y3(1+(ave_len*(i-1)):ave_len*i,1),window_length,overlap,fft_freqs,Fs,'yaxis', 'power');
-    ylim([0.1 15]);
+%     subplot(211), spectrogram(y3(1+(ave_len*(i-1)):ave_len*i,1),window_length,overlap,fft_freqs,Fs,'yaxis', 'power');
+    ylim([50/1000 150/1000]);
     title('Dev');
 
     hold on
     subplot(212), spectrogram(y2(1+(ave_len*(i-1)):ave_len*i,1),window_length,overlap,fft_freqs,Fs,'yaxis', 'power');
-    subplot(212), spectrogram(y4(1+(ave_len*(i-1)):ave_len*i,1),window_length,overlap,fft_freqs,Fs,'yaxis', 'power');
-    ylim([0.1 15]);
+%     subplot(212), spectrogram(y4(1+(ave_len*(i-1)):ave_len*i,1),window_length,overlap,fft_freqs,Fs,'yaxis', 'power');
+    ylim([50/1000 150/1000]);
     title('Elle');
 end
 
