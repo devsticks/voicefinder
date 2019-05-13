@@ -14,6 +14,6 @@ function smear = fft_smear(Fs, lower_bound, upper_bound, max_fft_samples, sample
     f = movmean(f, round(len/10000));
 
     % smear...
-    f1plt = mat2gray(f);%, [0 max_fft_samples/400]); % set maximum pixel intensity
+    f1plt = mat2gray(f, [0 max_fft_samples/20]); % set maximum pixel intensity
     smear = repmat(f1plt, 1, length(f1plt));
 end

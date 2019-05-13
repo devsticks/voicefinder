@@ -1,0 +1,99 @@
+clear;
+
+%get dem tracks
+%specify sampling frequency
+Fs = 48000;
+window_length = 2000;%48000*10;
+overlap = 10;
+fft_freqs = 20000; 
+max_fft_samples = 48000;
+silence_thresh = 0.3;
+transient_thresh = 0.25;
+
+filenames = ["Dev1.m4a", "Dev2.m4a", "Dev3.m4a", "Elle1.m4a", "Elle2.mp4", "Silence.m4a"];%, "DevElleDiff", "DevElleSame", "silence", "testingVariety"];
+filepaths = '../sound_recs/mono_' + filenames;
+
+%right mic
+[y1,fs1] = audioread(filepaths(1));
+[y2,fs2] = audioread(filepaths(4));
+[y3,fs3] = audioread(filepaths(6));
+
+    y1 = remove_transients(y1, transient_thresh);
+    y2 = remove_transients(y2, transient_thresh);
+    y3 = remove_transients(y3, transient_thresh);
+
+prior_marker = "";
+markers = [];
+this_marker_start = 1;
+
+
+ave_len = Fs*50; %average over 1/4 second intervals
+
+for listening_to = 1:length(filenames)
+
+    [clip,fs1] = audioread(filepaths(listening_to));
+    
+    % remove transients
+    clip = remove_transients(clip, transient_thresh);
+    
+    % normalise volume
+%     clip = normalize(clip);
+    
+    %% To check what clips look like before and after silence removal
+    %     figure();
+    %     hold on
+    %     plot(clip)
+    %     remove silence
+    %     clip = remove_silence(clip, silence_thresh);
+    %     plot(clip)
+    %     continue
+
+%     clip = remove_silence(clip, silence_thresh);
+
+    % basic low pass to remove noise introduced by downsampling
+%     clip = movmean(clip, 100);
+%     soundsc(clip,48000)
+%     return
+% figure()
+
+    % take as many snippets from the clip as possible
+    % MAYBE MAKE INTO SLIDING WINDOW RATHER THAN JUMPING? - Dev
+    for k = 1:floor(length(clip)/max_fft_samples)
+        % extract segment for each smear
+        start_sample = ((k-1) * max_fft_samples) + 1;
+        end_sample = (k * max_fft_samples);
+        this_snippet = clip(start_sample:end_sample);
+        
+        % make and save spectrograms
+        spectrogram(this_snippet,window_length,overlap,fft_freqs,Fs,'yaxis', 'power')
+        colormap HSV
+        caxis([-140 -20])
+        ylim([50/1000 250/1000]);
+       
+%         if (k>8)
+%             return;
+%         end
+
+        % are we looking at Dev or Elle?
+        this_marker = extractBefore(filenames(listening_to), 4);
+        if (this_marker ~= prior_marker)
+            this_marker_start = listening_to;
+            prior_marker = extractBefore(filenames(listening_to), 4);
+            markers = [markers prior_marker];
+        end
+        
+        outputfilename = char('../smeared_ffts/' + prior_marker + '/' + k*(listening_to));% + '.png');
+        set(gca,'xcolor','w','ycolor','w','xtick',[],'ytick',[])
+        set(gca,'box','off')
+        axis off
+        colorbar('off');
+        set(gca,'LooseInset',get(gca,'TightInset'));
+        print(outputfilename, '-dpng', '-noui');
+%         saveas(gca,outputfilename)
+%         imwrite(smear, outputfilename);
+    end
+end
+
+for q = 1:length(markers)
+    zip('../smeared_ffts/' + markers(q) + '.zip','../smeared_ffts/' + markers(q));
+end
