@@ -5,13 +5,14 @@ clear;
 
 %specify sampling frequency
 Fs = 48000;
+snippet_length = 1; % in seconds
 silence_thresh = 0.3;
 transient_thresh = 0.25;
 
 % set fft bounds
 lowerbnd = 50; % hertz
 upperbnd = 250;
-max_fft_samples = 6*48000; % 1 second
+max_fft_samples = snippet_length*Fs; % 1 second
 
 filenames = ["Dev1.m4a", "Dev2.m4a", "Dev3.m4a", "Elle1.m4a", "Elle2.mp4", "Silence.m4a"];%, "DevElleDiff", "DevElleSame", "silence", "testingVariety"];
 filepaths = '../sound_recs/mono_' + filenames;
@@ -56,9 +57,9 @@ for listening_to = 1:length(filenames)
 
     % take as many snippets from the clip as possible
     % MAYBE MAKE INTO SLIDING WINDOW RATHER THAN JUMPING? - Dev
-    for k = 1:floor(length(clip)/(max_fft_samples/12))-12 % 1/2 second stride
+    for k = 1:floor(length(clip)/(max_fft_samples/(2*snippet_length)))-(2*snippet_length) % 1/2 second stride
         % extract segment for each smear
-        start_sample = ((k-1) * (max_fft_samples/12)) + 1; % start every 1/2 second
+        start_sample = ((k-1) * (max_fft_samples/(2*snippet_length))) + 1; % start every 1/2 second
         end_sample = start_sample+max_fft_samples;%(k * max_fft_samples); % capture 1 second worth
         this_snippet = clip(start_sample:end_sample);
 
